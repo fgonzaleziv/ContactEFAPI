@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Bogus;
 using ContactEFAPI.Models;
+using DatabasePopulationMethods;
 
 //Pulling some sample data from Bogus examples
 
@@ -39,13 +40,16 @@ var user = testDepartment.Generate(3);
 user.OutputConsole();
 
 //Console.WriteLine(JsonSerializer.Serialize(user, new JsonSerializerOptions { WriteIndented = true }));
-public static class ExtensionsForTesting
+namespace DatabasePopulationMethods
 {
-    public static void OutputConsole(this object obj)
+    public static class ExtensionsForTesting
     {
-        Console.WriteLine(JsonSerializer.Serialize(obj, new JsonSerializerOptions
+        public static void OutputConsole(this object obj)
         {
-            WriteIndented = true
-        }));
+            Console.WriteLine(JsonSerializer.Serialize(obj, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            }));
+        }
     }
 }

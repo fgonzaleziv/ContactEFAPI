@@ -6,9 +6,9 @@ namespace ContactEFAPI.Models
     {
         [Key]
         public int EmployeeId { get; set; }
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
+        public required string FirstName { get; set; }
+        public required string MiddleName { get; set; }
+        public required string LastName { get; set; }
         public int? LocationId { get; set; }
         public Location? Location { get; set; }
         public string? Phone { get; set; }
