@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ContactEFAPI.Data;
 using ContactEFAPI.Models;
+using AutoMapper;
 
 namespace ContactEFAPI.Controllers
 {
@@ -15,32 +16,42 @@ namespace ContactEFAPI.Controllers
     public class DepartmentsController : ControllerBase
     {
         private readonly ContactManagementContext _context;
+        private readonly IMapper _mapper;
 
-        public DepartmentsController(ContactManagementContext context)
+        public DepartmentsController(ContactManagementContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Departments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetDepartments()
         {
-          if (_context.Departments == null)
-          {
-              return NotFound();
-          }
-            return await _context.Departments.ToListAsync();
+            if (_context.Departments == null)
+            {
+                return NotFound();
+            }
+            var dbReturn = await _context.Departments
+                 .AsNoTracking()
+                 .ToListAsync();
+            return _mapper.Map<List<Department>, List<DepartmentDTO>>(dbReturn);
         }
 
         // GET: api/Departments/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Department>> GetDepartment(int id)
         {
-          if (_context.Departments == null)
-          {
-              return NotFound();
-          }
-            var department = await _context.Departments.FindAsync(id);
+            if (_context.Departments == null)
+            {
+                return NotFound();
+            }
+            var department = await _context.Departments
+                .Include(c => c.Primary)
+                .Include(c => c.Secondary)
+                .Include(c => c.Location)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Id == id);
 
             if (department == null)
             {
@@ -86,10 +97,10 @@ namespace ContactEFAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Department>> PostDepartment(Department department)
         {
-          if (_context.Departments == null)
-          {
-              return Problem("Entity set 'ContactManagementContext.Departments'  is null.");
-          }
+            if (_context.Departments == null)
+            {
+                return Problem("Entity set 'ContactManagementContext.Departments'  is null.");
+            }
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 

@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using Bogus;
+using ContactEFAPI.Data;
 using ContactEFAPI.Models;
 using DatabasePopulationMethods;
+using Microsoft.EntityFrameworkCore;
 
 //Pulling some sample data from Bogus examples
 
@@ -14,7 +16,7 @@ var testLocation = new Faker<Location>()
     .RuleFor(l => l.Latitude, f => f.Address.Latitude())
     .RuleFor(l => l.Longitude, f => f.Address.Longitude());
 
-
+var contactId = 1;
 var testContact = new Faker<Contact>()
     .RuleFor(c => c.FirstName, f => f.Name.FirstName())
     .RuleFor(c => c.MiddleName, f => f.Name.FirstName())
@@ -30,14 +32,23 @@ var testContact = new Faker<Contact>()
 var testDepartment = new Faker<Department>()
     .RuleFor(d => d.Name, f => f.Commerce.Department())
     .RuleFor(d => d.Code, (f, d) => d.Name[..f.Random.Number(2, 3)].ToUpper())
-    .RuleFor(d => d.Primary, f => testContact.Generate())
-    .RuleFor(d => d.Location, f => testLocation.Generate())
+    //.RuleFor(d => d.Primary, f => testContact.Generate())
+    //.RuleFor(d => d.Location, f => testLocation.Generate())
+    .RuleFor(d => d.LocationId, f => 5)
     .RuleFor(d => d.Description, f => f.Hacker.IngVerb() + " " + f.Hacker.Adjective() + " " + f.Hacker.Noun());
 
+using ContactManagementContext test = new();
+ExtensionsForTesting.DatabaseMagic<Location>.Initialize(test, testLocation, test.Locations);
 
+//    test.Contacts.AddRange(testContact.Generate(2));
+//    test.SaveChanges();
 
-var user = testDepartment.Generate(3);
-user.OutputConsole();
+//test.Departments.AddRange(testDepartment.Generate(4));
+//test.SaveChanges();
+
+//var user = testDepartment.Generate(3);
+
+//user.OutputConsole();
 
 //Console.WriteLine(JsonSerializer.Serialize(user, new JsonSerializerOptions { WriteIndented = true }));
 namespace DatabasePopulationMethods
@@ -51,5 +62,18 @@ namespace DatabasePopulationMethods
                 WriteIndented = true
             }));
         }
+        //public class DatabaseMagic<T>
+        //{     
+        //public static void Initialize(ContactManagementContext context, Faker fakerModel, DbSet database)
+        //{
+        //    database.AddRange(fakerModel.Generate(3));
+        //    context.SaveChanges();
+        //}
+        //}
+        //public static void Initialize(DbSet<T> dbSet, Faker<T> fakerModel, ContactManagementContext context)
+        //{
+        //    dbSet.AddRange(fakerModel.Generate(3));
+        //    context.SaveChanges();
+        //}
     }
 }

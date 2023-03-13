@@ -11,12 +11,12 @@ namespace ContactEFAPI.Models
         public int? LocationId { get; set; }
         [ForeignKey("LocationId")]
         public virtual Location? Location { get; set; }
-        public int PrimaryId { get; set; }
+        public int? PrimaryId { get; set; }
         [ForeignKey("PrimaryId")]
-        public virtual Contact Primary {get;set;} = null!;
-        public int SecondaryId { get; set; }
+        public virtual Contact? Primary {get;set;} = null!;
+        public int? SecondaryId { get; set; }
         [ForeignKey("SecondaryId")]
-        public virtual Contact Secondary { get;set;} = null!;
+        public virtual Contact? Secondary { get;set;} = null!;
 
     }
 }
